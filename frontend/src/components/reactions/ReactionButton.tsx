@@ -77,18 +77,21 @@ const ReactionButton: React.FC<ReactionButtonProps> = ({
   };
 
   const getTotalReactions = () => {
-    return Object.values(reactions).reduce((total, reaction) => total + reaction.count, 0);
+    if (!reactions || typeof reactions !== 'object') return 0;
+    return Object.values(reactions).reduce((total, reaction) => total + (reaction?.count || 0), 0);
   };
 
   const getUserReaction = () => {
-    return Object.entries(reactions).find(([_, data]) => data.userReacted)?.[0];
+    if (!reactions || typeof reactions !== 'object') return undefined;
+    return Object.entries(reactions).find(([_, data]) => data?.userReacted)?.[0];
   };
 
   const getMostPopularReactions = () => {
+    if (!reactions || typeof reactions !== 'object') return [];
     return Object.entries(reactions)
-      .sort(([,a], [,b]) => b.count - a.count)
+      .sort(([,a], [,b]) => (b?.count || 0) - (a?.count || 0))
       .slice(0, 3)
-      .filter(([_, data]) => data.count > 0);
+      .filter(([_, data]) => (data?.count || 0) > 0);
   };
 
   const totalReactions = getTotalReactions();
