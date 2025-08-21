@@ -146,7 +146,7 @@ const PostPreview = ({ classification, originalPrompt, onBack, onPostCreated }: 
             <div className={`w-3 h-3 rounded-full ${config.color}`}></div>
             <CardTitle>Preview: {config.title}</CardTitle>
             <Badge variant={config.badge}>
-              {Math.round(classification.confidence * 100)}% confidence
+              Auto-detected
             </Badge>
           </div>
           <Button variant="ghost" size="sm" onClick={onBack}>
