@@ -1,270 +1,198 @@
-# 🎓 IIIT-Una Feed - AI-Powered Campus Feed
+# IIIT-Una Feed Platform
 
-> **Built for the AI Hackathon Challenge** - A smart campus feed that supports Events, Lost & Found, and Announcements with AI-powered post classification.
+A comprehensive campus feed platform built with Spring Boot backend and Next.js frontend, featuring events, lost & found items, comments, reactions, and AI-powered content moderation.
 
-## 👥 Team Structure & Contributions
+## 🚀 Features
 
-### 🔧 **Backend Developer** (Mohitkmeena)
-- Spring Boot APIs with MySQL
-- Event & Lost/Found entities with rich relationships
-- User response tracking (Going/Interested/Not Going)
-- RESTful API design with proper validation
+### Backend Features
+- **Events Management**: Create, update, delete, and respond to campus events
+- **Lost & Found System**: Post and manage lost/found items with resolution tracking
+- **Comment System**: Nested comments with AI-powered toxicity detection
+- **Reaction System**: Like, love, laugh, wow, sad, and angry reactions
+- **AI Services**: Content classification, toxicity detection, and meme generation
+- **Database**: MySQL support with H2 fallback for development
+- **RESTful API**: Comprehensive API endpoints with proper error handling
 
-### 🎨 **Frontend Developer** (Siddharth Pundir)  
-- Modular Next.js architecture with TypeScript
-- Beautiful Tailwind CSS components
-- Single textbox → smart preview workflow
-- Responsive design with loading states
-
-### 🚀 **Full Stack Developer** (Rituraj)
-- AI integration with OpenAI API
-- Comments & Reactions system
-- Toxicity detection & content moderation
-- Complete system integration
+### Frontend Features
+- **Modern UI**: Built with Next.js 14, TypeScript, and Tailwind CSS
+- **Real-time Updates**: Live feed updates with optimistic UI
+- **Responsive Design**: Mobile-first approach with beautiful animations
+- **API Integration**: Centralized API service layer
+- **User Management**: Device-based user identification
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend      │    │   External      │
-│   (Next.js)     │◄──►│ (Spring Boot)   │◄──►│  (OpenAI API)   │
-│   Port 3000     │    │   Port 8080     │    │  (MySQL DB)     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+├── backend/                 # Spring Boot Backend
+│   ├── src/main/java/      # Java source code
+│   ├── src/main/resources/ # Configuration files
+│   └── pom.xml            # Maven dependencies
+├── frontend/               # Next.js Frontend
+│   ├── src/app/           # App router pages
+│   ├── src/components/    # React components
+│   ├── src/services/      # API services
+│   └── package.json       # Node.js dependencies
+└── README.md              # This file
 ```
 
-- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS
-- **Backend**: Spring Boot 3.5.4 + MySQL + JPA
-- **AI**: OpenAI GPT-3.5-turbo for classification & toxicity detection
-- **Authentication**: Device ID based (no login required)
+## 🛠️ Tech Stack
 
-## ⚡ Quick Start
+### Backend
+- **Framework**: Spring Boot 3.5.4
+- **Language**: Java 17
+- **Database**: MySQL 8.0 / H2 (development)
+- **ORM**: Spring Data JPA with Hibernate
+- **Build Tool**: Maven
+- **API**: RESTful with CORS support
 
-### 🛠️ Prerequisites
-- Java 17+
-- Node.js 18+
-- MySQL 8.0+
-- OpenAI API Key
+### Frontend
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React Hooks
+- **Build Tool**: Vite
 
-### 🚀 Setup & Installation
+## 📋 Prerequisites
 
-1. **Clone and Setup Environment**
+- Java 17 or higher
+- Node.js 18 or higher
+- MySQL 8.0 or higher (for production)
+- Maven 3.6 or higher
+
+## 🚀 Quick Start
+
+### 1. Clone the Repository
 ```bash
-git clone https://github.com/mohitkmeena/headout.git
+git clone <repository-url>
 cd headout
-./setup-env.sh
 ```
 
-2. **Configure OpenAI API Key**
-```bash
-# Edit backend/.env and add your OpenAI API key
-OPENAI_API_KEY=your-actual-openai-api-key-here
-```
+### 2. Backend Setup
 
-3. **Setup Database**
-```sql
-CREATE DATABASE iiituna_feed;
--- Tables will be auto-created by Spring Boot
-```
-
-4. **Start Backend (Terminal 1)**
+#### MySQL Database (Recommended)
 ```bash
 cd backend
-./mvnw spring-boot:run
-# Backend will start on http://localhost:8080
+# Start MySQL using Docker (easiest method)
+chmod +x start-mysql.sh
+./start-mysql.sh
+
+# Or start MySQL manually and update credentials in application.properties
+mvn spring-boot:run
 ```
 
-5. **Start Frontend (Terminal 2)**
+#### Alternative: H2 Database (Development only)
+```bash
+cd backend
+# Temporarily switch to H2 by commenting out MySQL profile
+mvn spring-boot:run
+```
+
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run dev
-# Frontend will start on http://localhost:3000
 ```
 
-6. **Visit Application**
-Open http://localhost:3000 in your browser!
+### 4. Access the Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080/api
+- **H2 Console**: http://localhost:8080/h2-console (if using H2)
 
-## ✨ Core Features
+## 📚 API Documentation
 
-### 🤖 **Smart Post Creation**
-- **Single Textbox Input**: Natural language processing
-- **AI Classification**: Automatically detects post type
-- **Editable Preview**: Refine details before posting
-- **Confidence Scoring**: Shows AI confidence level
+Comprehensive API documentation is available in `backend/API_DOCUMENTATION.md`
 
-### 📝 **Post Types**
+### Key Endpoints
+- **Events**: `/api/events`
+- **Lost & Found**: `/api/lost-found`
+- **Comments**: `/api/comments`
+- **Reactions**: `/api/reactions`
+- **AI Services**: `/api/ai`
 
-#### 🎪 **Event Posts**
-- Workshop, seminars, fests, competitions
-- Date, time, location tracking
-- User responses: Going/Interested/Not Going
-- Real-time attendance tracking
+## 🔧 Configuration
 
-#### 🔍 **Lost & Found Posts**  
-- Missing items with last known location
-- Found items with discovery location
-- Contact information & resolution tracking
-- Image attachments support
+### Backend Configuration
+- **Database**: Configure in `src/main/resources/application.properties`
+- **Profiles**: Use `dev`, `prod`, or `mysql` profiles
+- **CORS**: Configured for development (allows all origins)
 
-#### 📢 **Announcement Posts**
-- Official notices from departments
-- Timetables and campus-wide updates
-- Department attribution
-- PDF/image attachments
+### Frontend Configuration
+- **API Base URL**: Configure in `src/services/api.ts`
+- **Environment Variables**: Use `.env.local` for environment-specific config
 
-### 🎯 **AI Features**
+## 🗄️ Database Schema
 
-#### 🧠 **Smart Classification**
-```
-"Lost my black wallet near library" → Lost Item
-"Workshop on Docker tomorrow 5pm" → Event  
-"Found iPhone near cafeteria" → Found Item
-```
+### Events Table
+- `id`, `title`, `description`, `location`, `event_date`
+- `image_url`, `created_by`, `created_at`
+- `going_count`, `interested_count`, `not_going_count`
 
-#### 🛡️ **Toxicity Guard**
-- Real-time content moderation
-- Warning system with suggestions
-- Score-based toxicity detection
-- Non-censorship approach (warnings only)
+### Lost & Found Table
+- `id`, `item_name`, `description`, `type`, `location`
+- `incident_date`, `image_url`, `contact_info`
+- `created_by`, `created_at`, `is_resolved`
 
-#### 🎭 **AI Meme Generator** (Bonus)
-- `/meme <prompt>` in comments
-- AI-generated memes
-- Redo/submit options
+### Comments Table
+- `id`, `content`, `post_id`, `post_type`, `parent_id`
+- `created_by`, `created_at`, `is_toxic`, `toxicity_score`
 
-### 💬 **Social Features**
-- **Threaded Comments**: n-level nested discussions
-- **Emoji Reactions**: 👍❤️😂😢😠 for posts & comments
-- **Real-time Updates**: Live feed refresh
-- **Device-based Identity**: No login required
-
-## 🔌 API Endpoints
-
-### Core Posts
-```http
-GET    /api/events                    # Get all events
-POST   /api/events                    # Create event
-POST   /api/events/{id}/response      # Respond to event
-
-GET    /api/lost-found                # Get lost/found items  
-POST   /api/lost-found                # Create lost/found item
-POST   /api/lost-found/{id}/resolve   # Mark as resolved
-```
-
-### AI Features
-```http
-POST   /api/ai/classify               # Classify post text
-POST   /api/ai/check-toxicity         # Check content toxicity
-POST   /api/ai/generate-meme          # Generate meme
-```
-
-### Social Features  
-```http
-GET    /api/comments/{postType}/{postId}     # Get comments
-POST   /api/comments/{postType}/{postId}     # Add comment
-POST   /api/reactions/{postType}/{postId}    # Add reaction
-```
-
-## 🎨 Component Architecture
-
-```
-frontend/src/
-├── components/
-│   ├── ui/              # Reusable UI components
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Input.tsx
-│   │   └── Badge.tsx
-│   ├── post/            # Post creation components
-│   │   ├── PostInput.tsx
-│   │   └── PostPreview.tsx
-│   └── feed/            # Feed display components
-│       ├── FeedPost.tsx
-│       └── FeedSkeleton.tsx
-├── lib/                 # Utilities
-├── types/               # TypeScript definitions
-└── hooks/               # Custom React hooks
-```
-
-## 🌟 Hackathon Highlights
-
-### ✅ **Completion Criteria Met**
-- ✅ All 3 post types implemented
-- ✅ Single textbox → classification → preview workflow
-- ✅ Core interactions (posting, commenting, reactions)
-- ✅ Stable, bug-free implementation
-
-### 🎨 **Design Excellence**
-- ✅ Clean, consistent UI design
-- ✅ Intuitive post creation flow
-- ✅ Responsive, uncluttered feed
-- ✅ Professional-level polish
-
-### 🤝 **Team Collaboration**
-- ✅ Clear role separation and integration
-- ✅ Shared comments/reactions module
-- ✅ Effective Git workflow with meaningful commits
-- ✅ Individual contributions clearly visible
-
-### 💻 **Code Quality**
-- ✅ Modular, maintainable architecture
-- ✅ Meaningful commit messages
-- ✅ TypeScript for type safety
-- ✅ RESTful API design
-
-## 🔧 Development Commands
-
-```bash
-# Backend Development
-cd backend
-./mvnw spring-boot:run          # Start server
-./mvnw test                     # Run tests
-./mvnw clean package            # Build JAR
-
-# Frontend Development  
-cd frontend
-npm run dev                     # Development server
-npm run build                   # Production build
-npm run type-check              # TypeScript check
-npm run lint                    # ESLint check
-```
+### Reactions Table
+- `id`, `reaction_type`, `post_id`, `post_type`, `target_type`
+- `target_id`, `created_by`, `created_at`
 
 ## 🚀 Deployment
 
-### Backend (Spring Boot)
+### Backend Deployment
 ```bash
 cd backend
-./mvnw clean package
+mvn clean package
 java -jar target/feed-backend-0.0.1-SNAPSHOT.jar
 ```
 
-### Frontend (Next.js)
+### Frontend Deployment
 ```bash
 cd frontend
 npm run build
 npm start
 ```
 
-## 🎯 Future Enhancements
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the API documentation
+
+## 🔮 Future Enhancements
 
 - [ ] Real-time notifications
-- [ ] Image upload & storage
-- [ ] Advanced search & filtering
+- [ ] Push notifications
+- [ ] Advanced search and filtering
+- [ ] Image upload and management
+- [ ] User authentication and authorization
 - [ ] Mobile app development
-- [ ] Admin dashboard
-- [ ] Analytics & insights
+- [ ] Analytics and reporting
+- [ ] Multi-language support
 
-## 📄 License
+## 📊 Project Status
 
-Built for educational purposes as part of the IIIT-Una AI Hackathon Challenge.
-
----
-
-### 🏆 **Hackathon Success Metrics**
-- **⏱️ Time Management**: 3-hour sprint completed successfully
-- **🎯 Feature Completion**: All required features implemented
-- **🤖 AI Integration**: Smart classification with 85%+ accuracy
-- **👥 Team Coordination**: Seamless collaboration across 3 developers
-- **💡 Innovation**: Unique single-textbox UX with AI-powered preview
-
-**Built with ❤️ by Team IIIT-Una**
+- ✅ Backend API complete
+- ✅ Frontend basic structure
+- ✅ Database integration
+- ✅ AI services integration
+- 🔄 Frontend components (in progress)
+- ⏳ Testing and documentation
+- ⏳ Deployment configuration

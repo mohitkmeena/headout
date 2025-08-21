@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: iiituna_feed_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: iiituna_feed
+      MYSQL_USER: feeduser
+      MYSQL_PASSWORD: feedpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - feed_network
+
+  mysql-admin:
+    image: phpmyadmin/phpmyadmin
+    container_name: iiituna_feed_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: password
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - feed_network
+
+volumes:
+  mysql_data:
+
+networks:
+  feed_network:
+    driver: bridge

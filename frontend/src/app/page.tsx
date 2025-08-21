@@ -5,37 +5,22 @@ import PostInput from '@/components/post/PostInput';
 import FeedPost from '@/components/feed/FeedPost';
 import FeedSkeleton from '@/components/feed/FeedSkeleton';
 import { Post } from '@/types/post';
+import { api } from '@/services/api';
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Get device ID for user identification
-  const getDeviceId = () => {
-    if (typeof window !== 'undefined') {
-      let deviceId = localStorage.getItem('deviceId');
-      if (!deviceId) {
-        deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('deviceId', deviceId);
-      }
-      return deviceId;
-    }
-    return 'device_default';
-  };
-
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const deviceId = getDeviceId();
+      const deviceId = api.getUserDeviceId();
       
-      // Fetch both events and lost/found items
-      const [eventsResponse, lostFoundResponse] = await Promise.all([
-        fetch(`http://localhost:8080/api/events?userId=${deviceId}`),
-        fetch(`http://localhost:8080/api/lost-found`)
+      // Fetch both events and lost/found items using the API service
+      const [events, lostFoundItems] = await Promise.all([
+        api.events.getAll(deviceId),
+        api.lostFound.getAll()
       ]);
-
-      const events = await eventsResponse.json();
-      const lostFoundItems = await lostFoundResponse.json();
 
       // Combine and sort by creation date
       const allPosts: Post[] = [
