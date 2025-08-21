@@ -32,10 +32,10 @@ public class AnnouncementDto {
     private String attachmentName;
     private String createdBy;
     
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm[:ss][.SSS]")
     private LocalDateTime createdAt;
     
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm[:ss][.SSS]")
     private LocalDateTime expiryDate;
     
     private Boolean isActive;
@@ -164,5 +164,25 @@ public class AnnouncementDto {
     
     public void setIsExpired(Boolean isExpired) {
         this.isExpired = isExpired;
+    }
+    
+    @Override
+    public String toString() {
+        return "AnnouncementDto{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", department='" + department + '\'' +
+                ", type='" + type + '\'' +
+                ", priority='" + priority + '\'' +
+                ", attachmentUrl='" + attachmentUrl + '\'' +
+                ", attachmentName='" + attachmentName + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", expiryDate=" + expiryDate +
+                ", isActive=" + isActive +
+                ", isPinned=" + isPinned +
+                ", isExpired=" + isExpired +
+                '}';
     }
 }
