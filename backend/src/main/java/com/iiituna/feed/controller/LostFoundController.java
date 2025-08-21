@@ -22,15 +22,20 @@ public class LostFoundController {
     
     @Autowired
     private LostFoundRepository lostFoundRepository;
-    
+    e
     // Get all lost & found items
     @GetMapping
     public ResponseEntity<List<LostFoundDto>> getAllItems() {
-        List<LostFound> items = lostFoundRepository.findAllByOrderByCreatedAtDesc();
-        List<LostFoundDto> itemDtos = items.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(itemDtos);
+        try {
+            List<LostFound> items = lostFoundRepository.findAllByOrderByCreatedAtDesc();
+            List<LostFoundDto> itemDtos = items.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(itemDtos);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
     
     // Get item by ID
