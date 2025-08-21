@@ -23,18 +23,18 @@ const PostInput = ({ onPostCreated }: PostInputProps) => {
 
     setIsClassifying(true);
     try {
-      // Mock AI classification for now - will be replaced with actual AI integration
-      const mockClassification: PostClassificationResult = {
+      // Simple rule-based classification from prompt text
+      const classification: PostClassificationResult = {
         type: detectPostType(prompt),
         confidence: 0.85,
         extractedData: extractDataFromPrompt(prompt),
         suggestions: []
       };
 
-      setClassification(mockClassification);
+      setClassification(classification);
       setShowPreview(true);
     } catch (error) {
-      console.error('Error classifying post:', error);
+      console.error('Error processing post:', error);
     } finally {
       setIsClassifying(false);
     }
@@ -130,7 +130,7 @@ const PostInput = ({ onPostCreated }: PostInputProps) => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>AI will help classify your post automatically</span>
+              <span>Smart detection will classify your post type automatically</span>
             </div>
             
             <Button
@@ -138,7 +138,7 @@ const PostInput = ({ onPostCreated }: PostInputProps) => {
               disabled={!prompt.trim() || isClassifying}
               isLoading={isClassifying}
             >
-              {isClassifying ? 'Analyzing...' : 'Create Post'}
+              {isClassifying ? 'Processing...' : 'Create Post'}
             </Button>
           </div>
 
