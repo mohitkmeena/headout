@@ -17,12 +17,11 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Allow credentials
-        config.setAllowCredentials(true);
+        // Allow credentials - set to false for wildcard origins
+        config.setAllowCredentials(false);
         
-        // Allow all origins from localhost (for development)
-        config.addAllowedOriginPattern("http://localhost:*");
-        config.addAllowedOriginPattern("http://127.0.0.1:*");
+        // Allow all origins (for development)
+        config.addAllowedOriginPattern("*");
         
         // Allow all headers
         config.addAllowedHeader("*");
