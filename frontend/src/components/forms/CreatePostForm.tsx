@@ -99,354 +99,300 @@ const CreatePostForm: React.FC<CreatePostFormProps> = ({ onPostCreated, onCancel
         response = await api.announcements.create(announcementPayload, userId);
       }
 
-      if (response && onPostCreated) {
-        onPostCreated(response);
+      if (response) {
+        setError(null);
+        if (onPostCreated) {
+          onPostCreated(response);
+        }
+        // Reset form
+        setCommonData({ title: '', description: '', imageUrl: '' });
+        setEventData({ location: '', eventDate: '' });
+        setLostFoundData({ itemName: '', type: 'LOST', location: '', incidentDate: '', contactInfo: '' });
+        setAnnouncementData({ content: '', department: '', type: 'GENERAL', priority: 'MEDIUM', attachmentUrl: '', attachmentName: '', expiryDate: '' });
       }
-      
-      // Reset form
-      resetForm();
-      
-    } catch (error: any) {
-      setError(error.message || 'Failed to create post');
+    } catch (err: any) {
+      setError(err.message || 'Failed to create post');
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setCommonData({ title: '', description: '', imageUrl: '' });
-    setEventData({ location: '', eventDate: '' });
-    setLostFoundData({ itemName: '', type: 'LOST', location: '', incidentDate: '', contactInfo: '' });
-    setAnnouncementData({ content: '', department: '', type: 'GENERAL', priority: 'MEDIUM', attachmentUrl: '', attachmentName: '', expiryDate: '' });
+  const postTypeConfig = {
+    event: {
+      icon: '🎉',
+      label: 'Event',
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200'
+    },
+    lostfound: {
+      icon: '🔍',
+      label: 'Lost & Found',
+      color: 'from-amber-500 to-amber-600',
+      bgColor: 'bg-amber-50',
+      borderColor: 'border-amber-200'
+    },
+    announcement: {
+      icon: '📢',
+      label: 'Announcement',
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200'
+    }
   };
 
-  const renderEventFields = () => (
-    <>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Event Title *
-        </label>
-        <Input
-          value={commonData.title}
-          onChange={(e) => setCommonData(prev => ({ ...prev, title: e.target.value }))}
-          placeholder="e.g., Docker Workshop"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Description *
-        </label>
-        <Textarea
-          value={commonData.description}
-          onChange={(e) => setCommonData(prev => ({ ...prev, description: e.target.value }))}
-          placeholder="Describe your event..."
-          rows={3}
-          required
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Location *
-          </label>
-          <Input
-            value={eventData.location}
-            onChange={(e) => setEventData(prev => ({ ...prev, location: e.target.value }))}
-            placeholder="e.g., CSE Lab"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Date & Time *
-          </label>
-          <Input
-            type="datetime-local"
-            value={eventData.eventDate}
-            onChange={(e) => setEventData(prev => ({ ...prev, eventDate: e.target.value }))}
-            required
-          />
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Image URL (Optional)
-        </label>
-        <Input
-          value={commonData.imageUrl}
-          onChange={(e) => setCommonData(prev => ({ ...prev, imageUrl: e.target.value }))}
-          placeholder="https://example.com/image.jpg"
-        />
-      </div>
-    </>
-  );
+  const currentConfig = postTypeConfig[postType];
 
-  const renderLostFoundFields = () => (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Item Name *
-          </label>
-          <Input
-            value={lostFoundData.itemName}
-            onChange={(e) => setLostFoundData(prev => ({ ...prev, itemName: e.target.value }))}
-            placeholder="e.g., Black Wallet"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type *
-          </label>
-          <select
-            value={lostFoundData.type}
-            onChange={(e) => setLostFoundData(prev => ({ ...prev, type: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="LOST">Lost</option>
-            <option value="FOUND">Found</option>
-          </select>
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Description *
-        </label>
-        <Textarea
-          value={commonData.description}
-          onChange={(e) => setCommonData(prev => ({ ...prev, description: e.target.value }))}
-          placeholder="Describe the item and circumstances..."
-          rows={3}
-          required
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Location *
-          </label>
-          <Input
-            value={lostFoundData.location}
-            onChange={(e) => setLostFoundData(prev => ({ ...prev, location: e.target.value }))}
-            placeholder="e.g., Library, Hostel"
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Contact Info *
-          </label>
-          <Input
-            value={lostFoundData.contactInfo}
-            onChange={(e) => setLostFoundData(prev => ({ ...prev, contactInfo: e.target.value }))}
-            placeholder="Phone/Email"
-            required
-          />
+  return (
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Post Type Selection */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-slate-800">Select Post Type</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {Object.entries(postTypeConfig).map(([type, config]) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setPostType(type as PostType)}
+              className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                postType === type
+                  ? `${config.bgColor} ${config.borderColor} border-2 shadow-md`
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${config.color} flex items-center justify-center text-white text-xl`}>
+                  {config.icon}
+                </div>
+                <div>
+                  <div className="font-medium text-slate-900">{config.label}</div>
+                  <div className="text-sm text-slate-500">
+                    {type === 'event' && 'Share campus events and activities'}
+                    {type === 'lostfound' && 'Report lost items or found belongings'}
+                    {type === 'announcement' && 'Post official notices and updates'}
+                  </div>
+                </div>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Image URL (Optional)
-        </label>
-        <Input
-          value={commonData.imageUrl}
-          onChange={(e) => setCommonData(prev => ({ ...prev, imageUrl: e.target.value }))}
-          placeholder="https://example.com/image.jpg"
-        />
-      </div>
-    </>
-  );
 
-  const renderAnnouncementFields = () => (
-    <>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Announcement Title *
-        </label>
-        <Input
-          value={commonData.title}
-          onChange={(e) => setCommonData(prev => ({ ...prev, title: e.target.value }))}
-          placeholder="e.g., Mid-Semester Exam Schedule"
-          required
-        />
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Content *
-        </label>
+      {/* Common Fields */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-slate-800">Basic Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="Title"
+            placeholder="Enter a descriptive title"
+            value={commonData.title}
+            onChange={(e) => setCommonData({ ...commonData, title: e.target.value })}
+            required
+            icon="📝"
+          />
+          <Input
+            label="Image URL (Optional)"
+            placeholder="https://example.com/image.jpg"
+            value={commonData.imageUrl}
+            onChange={(e) => setCommonData({ ...commonData, imageUrl: e.target.value })}
+            icon="🖼️"
+          />
+        </div>
         <Textarea
-          value={announcementData.content}
-          onChange={(e) => setAnnouncementData(prev => ({ ...prev, content: e.target.value }))}
-          placeholder="Announcement content..."
+          label="Description"
+          placeholder="Provide detailed information about your post..."
+          value={commonData.description}
+          onChange={(e) => setCommonData({ ...commonData, description: e.target.value })}
           rows={4}
           required
         />
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Department *
-          </label>
-          <select
-            value={announcementData.department}
-            onChange={(e) => setAnnouncementData(prev => ({ ...prev, department: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select Department</option>
-            <option value="CSE">Computer Science</option>
-            <option value="ECE">Electronics</option>
-            <option value="ME">Mechanical</option>
-            <option value="CE">Civil</option>
-            <option value="Administration">Administration</option>
-            <option value="Academic">Academic</option>
-            <option value="General">General</option>
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type *
-          </label>
-          <select
-            value={announcementData.type}
-            onChange={(e) => setAnnouncementData(prev => ({ ...prev, type: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="GENERAL">General</option>
-            <option value="ACADEMIC">Academic</option>
-            <option value="ADMINISTRATIVE">Administrative</option>
-            <option value="EVENT">Event</option>
-            <option value="NOTICE">Notice</option>
-            <option value="CIRCULAR">Circular</option>
-            <option value="EXAM">Exam</option>
-            <option value="HOLIDAY">Holiday</option>
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Priority *
-          </label>
-          <select
-            value={announcementData.priority}
-            onChange={(e) => setAnnouncementData(prev => ({ ...prev, priority: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-            <option value="URGENT">Urgent</option>
-          </select>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Attachment URL (Optional)
-          </label>
-          <Input
-            value={announcementData.attachmentUrl}
-            onChange={(e) => setAnnouncementData(prev => ({ ...prev, attachmentUrl: e.target.value }))}
-            placeholder="https://example.com/document.pdf"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Expiry Date (Optional)
-          </label>
-          <Input
-            type="datetime-local"
-            value={announcementData.expiryDate}
-            onChange={(e) => setAnnouncementData(prev => ({ ...prev, expiryDate: e.target.value }))}
-          />
-        </div>
-      </div>
-    </>
-  );
 
-  return (
-    <Card className="max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Create New Post</h2>
-        
-        {/* Post Type Selection */}
-        <div className="flex gap-2 mb-6">
-          <Button
-            variant={postType === 'event' ? 'default' : 'outline'}
-            onClick={() => setPostType('event')}
-            size="sm"
-          >
-            📅 Event
-          </Button>
-          <Button
-            variant={postType === 'lostfound' ? 'default' : 'outline'}
-            onClick={() => setPostType('lostfound')}
-            size="sm"
-          >
-            🔍 Lost & Found
-          </Button>
-          <Button
-            variant={postType === 'announcement' ? 'default' : 'outline'}
-            onClick={() => setPostType('announcement')}
-            size="sm"
-          >
-            📢 Announcement
-          </Button>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
+      {/* Type-specific Fields */}
+      {postType === 'event' && (
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-slate-800">Event Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Location"
+              placeholder="Where is the event taking place?"
+              value={eventData.location}
+              onChange={(e) => setEventData({ ...eventData, location: e.target.value })}
+              required
+              icon="📍"
+            />
+            <Input
+              label="Event Date & Time"
+              type="datetime-local"
+              value={eventData.eventDate}
+              onChange={(e) => setEventData({ ...eventData, eventDate: e.target.value })}
+              required
+              icon="📅"
+            />
+          </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {postType === 'event' && renderEventFields()}
-        {postType === 'lostfound' && renderLostFoundFields()}
-        {postType === 'announcement' && renderAnnouncementFields()}
+      {postType === 'lostfound' && (
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-slate-800">Item Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Item Name"
+              placeholder="What item was lost/found?"
+              value={lostFoundData.itemName}
+              onChange={(e) => setLostFoundData({ ...lostFoundData, itemName: e.target.value })}
+              required
+              icon="🔍"
+            />
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
+              <select
+                value={lostFoundData.type}
+                onChange={(e) => setLostFoundData({ ...lostFoundData, type: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              >
+                <option value="LOST">Lost</option>
+                <option value="FOUND">Found</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Location"
+              placeholder="Where was it lost/found?"
+              value={lostFoundData.location}
+              onChange={(e) => setLostFoundData({ ...lostFoundData, location: e.target.value })}
+              required
+              icon="📍"
+            />
+            <Input
+              label="Incident Date"
+              type="date"
+              value={lostFoundData.incidentDate}
+              onChange={(e) => setLostFoundData({ ...lostFoundData, incidentDate: e.target.value })}
+              icon="📅"
+            />
+          </div>
+          <Input
+            label="Contact Information"
+            placeholder="How can people reach you?"
+            value={lostFoundData.contactInfo}
+            onChange={(e) => setLostFoundData({ ...lostFoundData, contactInfo: e.target.value })}
+            icon="📞"
+          />
+        </div>
+      )}
 
-        <div className="flex gap-3 pt-4">
+      {postType === 'announcement' && (
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-slate-800">Announcement Details</h3>
+          <Textarea
+            label="Content"
+            placeholder="Enter the full announcement content..."
+            value={announcementData.content}
+            onChange={(e) => setAnnouncementData({ ...announcementData, content: e.target.value })}
+            rows={4}
+            required
+          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Department</label>
+              <select
+                value={announcementData.department}
+                onChange={(e) => setAnnouncementData({ ...announcementData, department: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                required
+              >
+                <option value="">Select Department</option>
+                <option value="CSE">Computer Science</option>
+                <option value="ECE">Electronics</option>
+                <option value="ME">Mechanical</option>
+                <option value="ADMIN">Administration</option>
+                <option value="ACADEMIC">Academic</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
+              <select
+                value={announcementData.type}
+                onChange={(e) => setAnnouncementData({ ...announcementData, type: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              >
+                <option value="GENERAL">General</option>
+                <option value="ACADEMIC">Academic</option>
+                <option value="EVENT">Event</option>
+                <option value="URGENT">Urgent</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
+              <select
+                value={announcementData.priority}
+                onChange={(e) => setAnnouncementData({ ...announcementData, priority: e.target.value })}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+              >
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="URGENT">Urgent</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Attachment URL (Optional)"
+              placeholder="https://example.com/document.pdf"
+              value={announcementData.attachmentUrl}
+              onChange={(e) => setAnnouncementData({ ...announcementData, attachmentUrl: e.target.value })}
+              icon="📎"
+            />
+            <Input
+              label="Expiry Date (Optional)"
+              type="date"
+              value={announcementData.expiryDate}
+              onChange={(e) => setAnnouncementData({ ...announcementData, expiryDate: e.target.value })}
+              icon="⏰"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <span className="text-red-600">⚠️</span>
+            <span className="text-red-800 font-medium">{error}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-slate-200">
+        <Button
+          type="submit"
+          variant="gradient"
+          size="lg"
+          loading={loading}
+          className="flex-1"
+        >
+          {loading ? 'Creating...' : `Create ${currentConfig.label}`}
+        </Button>
+        {onCancel && (
           <Button
-            type="submit"
-            disabled={loading}
+            type="button"
+            variant="outline"
+            size="lg"
+            onClick={onCancel}
             className="flex-1"
           >
-            {loading ? 'Creating...' : `Create ${postType === 'lostfound' ? 'Lost & Found' : postType.charAt(0).toUpperCase() + postType.slice(1)}`}
+            Cancel
           </Button>
-          
-          {onCancel && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-          )}
-        </div>
-      </form>
-    </Card>
+        )}
+      </div>
+    </form>
   );
 };
 

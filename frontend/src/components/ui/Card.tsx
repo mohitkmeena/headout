@@ -1,33 +1,44 @@
-import { HTMLAttributes, forwardRef } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'event' | 'lost' | 'found' | 'announcement';
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  variant?: 'default' | 'elevated' | 'outlined' | 'glass';
+  hover?: boolean;
 }
 
-const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'default', children, ...props }, ref) => {
-    const baseStyles = 'bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow';
-    
-    const variants = {
-      default: '',
-      event: 'border-l-4 border-l-blue-500',
-      lost: 'border-l-4 border-l-amber-500',
-      found: 'border-l-4 border-l-green-500',
-      announcement: 'border-l-4 border-l-purple-500',
-    };
-
-    return (
-      <div
-        className={cn(baseStyles, variants[variant], className)}
-        ref={ref}
-        {...props}
-      >
-        {children}
-      </div>
-    );
-  }
-);
+const Card: React.FC<CardProps> = ({ 
+  children, 
+  className, 
+  variant = 'default',
+  hover = false,
+  ...props 
+}) => {
+  const baseClasses = "rounded-xl transition-all duration-300";
+  
+  const variantClasses = {
+    default: "bg-white border border-slate-200 shadow-sm",
+    elevated: "bg-white border border-slate-200 shadow-lg",
+    outlined: "bg-transparent border-2 border-slate-200",
+    glass: "bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl"
+  };
+  
+  const hoverClasses = hover ? "hover:shadow-xl hover:scale-[1.02] hover:border-slate-300" : "";
+  
+  return (
+    <div 
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        hoverClasses,
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
 
 Card.displayName = 'Card';
 

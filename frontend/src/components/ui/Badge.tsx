@@ -1,28 +1,48 @@
-import { HTMLAttributes } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
-interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'success' | 'warning' | 'destructive';
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  children: React.ReactNode;
+  variant?: 'default' | 'outline' | 'success' | 'warning' | 'danger' | 'info';
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const Badge = ({ className, variant = 'default', ...props }: BadgeProps) => {
-  const variants = {
-    default: 'bg-blue-100 text-blue-800',
-    secondary: 'bg-slate-100 text-slate-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-amber-100 text-amber-800',
-    destructive: 'bg-red-100 text-red-800',
+const Badge: React.FC<BadgeProps> = ({ 
+  children, 
+  className, 
+  variant = 'default',
+  size = 'md',
+  ...props 
+}) => {
+  const baseClasses = "inline-flex items-center font-medium rounded-full transition-colors duration-200";
+  
+  const sizeClasses = {
+    sm: "px-2 py-0.5 text-xs",
+    md: "px-2.5 py-1 text-sm",
+    lg: "px-3 py-1.5 text-base"
   };
-
+  
+  const variantClasses = {
+    default: "bg-slate-100 text-slate-800 border border-slate-200",
+    outline: "bg-transparent text-slate-700 border border-slate-300",
+    success: "bg-green-100 text-green-800 border border-green-200",
+    warning: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+    danger: "bg-red-100 text-red-800 border border-red-200",
+    info: "bg-blue-100 text-blue-800 border border-blue-200"
+  };
+  
   return (
-    <div
+    <span 
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-        variants[variant],
+        baseClasses,
+        sizeClasses[size],
+        variantClasses[variant],
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </span>
   );
 };
 

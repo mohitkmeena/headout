@@ -129,11 +129,9 @@ const CompleteFeed: React.FC = () => {
 
       // Sort by creation date (newest first)
       feedPosts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      
       setPosts(feedPosts);
-    } catch (error: any) {
-      setError('Failed to load feed. Please try again.');
-      console.error('Error loading feed:', error);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load feed');
     } finally {
       setLoading(false);
     }
@@ -145,166 +143,164 @@ const CompleteFeed: React.FC = () => {
     setRefreshing(false);
   };
 
-  const handlePostCreated = (newPost: any) => {
+  const handlePostCreated = (post: any) => {
     setShowCreateForm(false);
-    handleRefresh(); // Reload the feed
+    loadFeed();
   };
 
-  const handleDeletePost = async (postId: number, postType: 'event' | 'lost_found' | 'announcement') => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
-
-    try {
-      switch (postType) {
-        case 'event':
-          await api.events.delete(postId, userId);
-          break;
-        case 'lost_found':
-          await api.lostFound.delete(postId, userId);
-          break;
-        case 'announcement':
-          await api.announcements.delete(postId, userId);
-          break;
-      }
-      
-      // Remove from local state
-      setPosts(posts => posts.filter(post => !(post.id === postId && post.type === postType)));
-    } catch (error) {
-      console.error('Error deleting post:', error);
-      alert('Failed to delete post. Please try again.');
-    }
+  const filterConfig = {
+    all: { label: 'All Posts', icon: '📰', color: 'from-slate-500 to-slate-600' },
+    events: { label: 'Events', icon: '🎉', color: 'from-blue-500 to-blue-600' },
+    lost_found: { label: 'Lost & Found', icon: '🔍', color: 'from-amber-500 to-amber-600' },
+    announcements: { label: 'Announcements', icon: '📢', color: 'from-purple-500 to-purple-600' },
+    my_posts: { label: 'My Posts', icon: '👤', color: 'from-green-500 to-green-600' }
   };
 
-  const getFilterCount = (filterType: FeedFilter) => {
-    if (filterType === 'all') return posts.length;
-    if (filterType === 'my_posts') {
-      return posts.filter(post => post.data.createdBy === userId).length;
-    }
-    return posts.filter(post => post.type === filterType.replace('_', '_')).length;
-  };
-
-  if (loading) {
+  if (showCreateForm) {
     return (
       <div className="max-w-4xl mx-auto p-6">
-        <LoadingSpinner />
-        <div className="text-center mt-4">
-          <p className="text-gray-600">Loading your feed...</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Create New Post</h1>
+            <p className="text-slate-600">Share something with the campus community</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowCreateForm(false)}
+            className="flex items-center gap-2"
+          >
+            ← Back to Feed
+          </Button>
         </div>
+        <Card className="p-8 shadow-xl">
+          <CreatePostForm
+            onPostCreated={handlePostCreated}
+            onCancel={() => setShowCreateForm(false)}
+          />
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">IIIT-Una Feed</h1>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            {refreshing ? 'Refreshing...' : '🔄 Refresh'}
-          </Button>
+    <div className="max-w-6xl mx-auto p-6">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">Campus Feed</h1>
+            <p className="text-lg text-slate-600">Stay updated with campus events, lost & found, and announcements</p>
+          </div>
           <Button
             onClick={() => setShowCreateForm(true)}
+            variant="gradient"
+            size="lg"
+            className="shrink-0"
           >
-            ➕ Create Post
+            ✨ Create Post
           </Button>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(filterConfig).map(([key, config]) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key as FeedFilter)}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+                filter === key
+                  ? `bg-gradient-to-r ${config.color} text-white shadow-lg`
+                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              <span>{config.icon}</span>
+              <span>{config.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Refresh Button */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-sm text-slate-500">
+          {posts.length} post{posts.length !== 1 ? 's' : ''} found
+        </div>
+        <Button
+          onClick={handleRefresh}
+          variant="outline"
+          size="sm"
+          loading={refreshing}
+          className="flex items-center gap-2"
+        >
+          🔄 Refresh
+        </Button>
+      </div>
+
+      {/* Error Display */}
       {error && (
-        <Card className="p-4 mb-6 bg-red-50 border-red-200">
-          <p className="text-red-700">{error}</p>
+        <Card className="p-4 mb-6 border-red-200 bg-red-50">
+          <div className="flex items-center gap-2 text-red-800">
+            <span>⚠️</span>
+            <span className="font-medium">{error}</span>
+          </div>
+        </Card>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="text-center">
+            <LoadingSpinner size="lg" variant="primary" />
+            <p className="mt-4 text-slate-600">Loading your feed...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && posts.length === 0 && (
+        <Card className="p-12 text-center">
+          <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">📭</span>
+          </div>
+          <h3 className="text-xl font-semibold text-slate-800 mb-2">No posts found</h3>
+          <p className="text-slate-600 mb-6">
+            {filter === 'my_posts' 
+              ? "You haven't created any posts yet. Start sharing with the campus community!"
+              : `No ${filter === 'all' ? '' : filter.replace('_', ' ')} posts available at the moment.`
+            }
+          </p>
           <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            className="mt-2"
+            onClick={() => setShowCreateForm(true)}
+            variant="gradient"
+            size="lg"
           >
-            Try Again
+            ✨ Create First Post
           </Button>
         </Card>
       )}
 
-      {/* Create Post Form */}
-      {showCreateForm && (
-        <div className="mb-6">
-          <CreatePostForm
-            onPostCreated={handlePostCreated}
-            onCancel={() => setShowCreateForm(false)}
-          />
+      {/* Feed Posts */}
+      {!loading && posts.length > 0 && (
+        <div className="space-y-6">
+          {posts.map((post) => (
+            <EnhancedFeedPost
+              key={`${post.type}-${post.id}`}
+              post={post}
+              onPostUpdated={loadFeed}
+            />
+          ))}
         </div>
       )}
 
-      {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {[
-          { key: 'all', label: 'All Posts', icon: '🏠' },
-          { key: 'events', label: 'Events', icon: '📅' },
-          { key: 'lost_found', label: 'Lost & Found', icon: '🔍' },
-          { key: 'announcements', label: 'Announcements', icon: '📢' },
-          { key: 'my_posts', label: 'My Posts', icon: '👤' },
-        ].map(({ key, label, icon }) => (
-          <Button
-            key={key}
-            variant={filter === key ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setFilter(key as FeedFilter)}
-            className="flex items-center gap-2"
-          >
-            <span>{icon}</span>
-            <span>{label}</span>
-            <Badge variant="secondary" className="ml-1">
-              {getFilterCount(key as FeedFilter)}
-            </Badge>
-          </Button>
-        ))}
-      </div>
-
-      {/* Feed Posts */}
-      <div className="space-y-6">
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <EnhancedFeedPost
-              key={`${post.type}-${post.id}`}
-              post={post.data}
-              postType={post.type}
-              onDelete={(id) => handleDeletePost(id, post.type)}
-              className="transition-all duration-200 hover:shadow-lg"
-            />
-          ))
-        ) : (
-          <Card className="p-12 text-center">
-            <div className="text-6xl mb-4">
-              {filter === 'events' ? '📅' : 
-               filter === 'lost_found' ? '🔍' : 
-               filter === 'announcements' ? '📢' : 
-               filter === 'my_posts' ? '👤' : '🏠'}
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              {filter === 'my_posts' ? 'No posts by you yet' : `No ${filter === 'all' ? 'posts' : filter.replace('_', ' & ')} available`}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {filter === 'my_posts' 
-                ? 'Create your first post to get started!'
-                : `Be the first to create a ${filter === 'all' ? 'post' : filter.replace('_', ' & ').toLowerCase()}!`}
-            </p>
-            <Button
-              onClick={() => setShowCreateForm(true)}
-            >
-              Create {filter === 'all' ? 'Post' : filter === 'lost_found' ? 'Lost & Found' : filter.charAt(0).toUpperCase() + filter.slice(1)}
-            </Button>
-          </Card>
-        )}
-      </div>
-
-      {/* Load More Button (for future pagination) */}
-      {posts.length > 0 && (
+      {/* Load More Button (if needed) */}
+      {!loading && posts.length > 0 && (
         <div className="text-center mt-8">
-          <Button variant="outline" disabled>
-            That's all for now! 🎉
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            className="px-8"
+          >
+            Load More Posts
           </Button>
         </div>
       )}
