@@ -46,4 +46,10 @@ public interface LostFoundRepository extends JpaRepository<LostFound, Long> {
     
     // Count unresolved items
     long countByIsResolved(Boolean isResolved);
+    
+    // Count items by type
+    long countByType(LostFoundType type);
+    
+    // Find items created after a specific date
+    List<LostFound> findByCreatedAtAfterOrderByCreatedAtDesc(LocalDateTime date);
 }

@@ -23,6 +23,12 @@ public class EventController {
     @Autowired
     private EventRepository eventRepository;
     
+    // Health check endpoint
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("Events API is working!");
+    }
+    
     // Get all events
     @GetMapping
     public ResponseEntity<List<EventDto>> getAllEvents(@RequestParam(required = false) String userId) {
@@ -132,6 +138,52 @@ public class EventController {
                 .map(event -> convertToDto(event, userId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(eventDtos);
+    }
+    
+    // Get events by location
+    @GetMapping("/location/{location}")
+    public ResponseEntity<List<EventDto>> getEventsByLocation(@PathVariable String location, @RequestParam(required = false) String userId) {
+        List<Event> events = eventRepository.findByLocationContainingIgnoreCase(location);
+        List<EventDto> eventDtos = events.stream()
+                .map(event -> convertToDto(event, userId))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(eventDtos);
+    }
+    
+    // Get user's events
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<EventDto>> getUserEvents(@PathVariable String userId, @RequestParam(required = false) String currentUserId) {
+        List<Event> events = eventRepository.findByCreatedByOrderByCreatedAtDesc(userId);
+        List<EventDto> eventDtos = events.stream()
+                .map(event -> convertToDto(event, currentUserId))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(eventDtos);
+    }
+    
+    // Get events for today
+    @GetMapping("/today")
+    public ResponseEntity<List<EventDto>> getTodayEvents(@RequestParam(required = false) String userId) {
+        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+        List<Event> events = eventRepository.findByEventDateBetweenOrderByEventDateAsc(startOfDay, endOfDay);
+        List<EventDto> eventDtos = events.stream()
+                .map(event -> convertToDto(event, userId))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(eventDtos);
+    }
+    
+    // Get event statistics
+    @GetMapping("/stats")
+    public ResponseEntity<Object> getEventStatistics() {
+        long totalEvents = eventRepository.count();
+        long upcomingEvents = eventRepository.countByEventDateAfter(LocalDateTime.now());
+        long pastEvents = totalEvents - upcomingEvents;
+        
+        return ResponseEntity.ok(new Object() {
+            public final long total = totalEvents;
+            public final long upcoming = upcomingEvents;
+            public final long past = pastEvents;
+        });
     }
     
     // Helper methods

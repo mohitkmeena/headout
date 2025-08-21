@@ -22,7 +22,12 @@ public class LostFoundController {
     
     @Autowired
     private LostFoundRepository lostFoundRepository;
-    e
+    
+    // Health check endpoint
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        return ResponseEntity.ok("LostFound API is working!");
+    }
     // Get all lost & found items
     @GetMapping
     public ResponseEntity<List<LostFoundDto>> getAllItems() {
@@ -143,6 +148,44 @@ public class LostFoundController {
     @GetMapping("/search")
     public ResponseEntity<List<LostFoundDto>> searchItems(@RequestParam String keyword) {
         List<LostFound> items = lostFoundRepository.findByItemNameOrDescriptionContainingIgnoreCase(keyword);
+        List<LostFoundDto> itemDtos = items.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(itemDtos);
+    }
+    
+    // Get statistics
+    @GetMapping("/stats")
+    public ResponseEntity<Object> getStatistics() {
+        long totalItems = lostFoundRepository.count();
+        long lostItems = lostFoundRepository.countByType(LostFoundType.LOST);
+        long foundItems = lostFoundRepository.countByType(LostFoundType.FOUND);
+        long resolvedItems = lostFoundRepository.countByIsResolved(true);
+        
+        return ResponseEntity.ok(new Object() {
+            public final long total = totalItems;
+            public final long lost = lostItems;
+            public final long found = foundItems;
+            public final long resolved = resolvedItems;
+            public final long unresolved = totalItems - resolvedItems;
+        });
+    }
+    
+    // Get user's items
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<LostFoundDto>> getUserItems(@PathVariable String userId) {
+        List<LostFound> items = lostFoundRepository.findByCreatedByOrderByCreatedAtDesc(userId);
+        List<LostFoundDto> itemDtos = items.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(itemDtos);
+    }
+    
+    // Get recent items (last 7 days)
+    @GetMapping("/recent")
+    public ResponseEntity<List<LostFoundDto>> getRecentItems() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        List<LostFound> items = lostFoundRepository.findByCreatedAtAfterOrderByCreatedAtDesc(sevenDaysAgo);
         List<LostFoundDto> itemDtos = items.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());

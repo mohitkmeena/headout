@@ -35,4 +35,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     
     // Count events created by user
     long countByCreatedBy(String createdBy);
+    
+    // Find events between dates with ordered results
+    List<Event> findByEventDateBetweenOrderByEventDateAsc(LocalDateTime startDate, LocalDateTime endDate);
+    
+    // Count upcoming events
+    long countByEventDateAfter(LocalDateTime currentDate);
 }
