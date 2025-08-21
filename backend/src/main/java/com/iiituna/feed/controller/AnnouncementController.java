@@ -57,9 +57,12 @@ public class AnnouncementController {
     
     // Create new announcement
     @PostMapping
-    public ResponseEntity<AnnouncementDto> createAnnouncement(@Valid @RequestBody AnnouncementDto announcementDto, 
+    public ResponseEntity<?> createAnnouncement(@Valid @RequestBody AnnouncementDto announcementDto, 
                                                              @RequestParam String userId) {
         try {
+            System.out.println("Creating announcement with data: " + announcementDto.toString());
+            System.out.println("UserId: " + userId);
+            
             Announcement announcement = convertToEntity(announcementDto);
             announcement.setCreatedBy(userId);
             announcement.setCreatedAt(LocalDateTime.now());
@@ -68,7 +71,8 @@ public class AnnouncementController {
             return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(savedAnnouncement));
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Error creating announcement: " + e.getMessage());
         }
     }
     
