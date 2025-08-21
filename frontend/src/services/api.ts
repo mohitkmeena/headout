@@ -209,10 +209,66 @@ export const getUserDeviceId = (): string => {
   return 'device_default';
 };
 
+// Announcements API
+export const announcementsApi = {
+  getAll: () => apiCall('/announcements'),
+  
+  getById: (id: number) => apiCall(`/announcements/${id}`),
+  
+  create: (announcementData: any, userId: string) => 
+    apiCall(`/announcements?userId=${userId}`, {
+      method: 'POST',
+      body: JSON.stringify(announcementData),
+    }),
+  
+  update: (id: number, announcementData: any, userId: string) => 
+    apiCall(`/announcements/${id}?userId=${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(announcementData),
+    }),
+  
+  delete: (id: number, userId: string) => 
+    apiCall(`/announcements/${id}?userId=${userId}`, {
+      method: 'DELETE',
+    }),
+  
+  togglePin: (id: number, userId: string) => 
+    apiCall(`/announcements/${id}/toggle-pin?userId=${userId}`, {
+      method: 'POST',
+    }),
+  
+  // Specific endpoints
+  healthCheck: () => apiCall('/announcements/health'),
+  
+  getByDepartment: (department: string) => 
+    apiCall(`/announcements/department/${encodeURIComponent(department)}`),
+  
+  getByType: (type: string) => 
+    apiCall(`/announcements/type/${type}`),
+  
+  getByPriority: (priority: string) => 
+    apiCall(`/announcements/priority/${priority}`),
+  
+  getPinned: () => apiCall('/announcements/pinned'),
+  
+  getUserAnnouncements: (userId: string) => 
+    apiCall(`/announcements/user/${userId}`),
+  
+  search: (keyword: string) => 
+    apiCall(`/announcements/search?keyword=${encodeURIComponent(keyword)}`),
+  
+  getRecent: () => apiCall('/announcements/recent'),
+  
+  getActive: () => apiCall('/announcements/active'),
+  
+  getStatistics: () => apiCall('/announcements/stats'),
+};
+
 // Export all APIs
 export const api = {
   events: eventsApi,
   lostFound: lostFoundApi,
+  announcements: announcementsApi,
   comments: commentsApi,
   reactions: reactionsApi,
   ai: aiApi,
