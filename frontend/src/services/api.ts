@@ -59,6 +59,20 @@ export const eventsApi = {
   
   search: (keyword: string, userId?: string) => 
     apiCall(`/events/search?keyword=${encodeURIComponent(keyword)}${userId ? `&userId=${userId}` : ''}`),
+  
+  // New specific endpoints
+  healthCheck: () => apiCall('/events/health'),
+  
+  getByLocation: (location: string, userId?: string) => 
+    apiCall(`/events/location/${encodeURIComponent(location)}${userId ? `?userId=${userId}` : ''}`),
+  
+  getUserEvents: (userId: string, currentUserId?: string) => 
+    apiCall(`/events/user/${userId}${currentUserId ? `?currentUserId=${currentUserId}` : ''}`),
+  
+  getTodayEvents: (userId?: string) => 
+    apiCall(`/events/today${userId ? `?userId=${userId}` : ''}`),
+  
+  getStatistics: () => apiCall('/events/stats'),
 };
 
 // Lost & Found API
@@ -95,6 +109,16 @@ export const lostFoundApi = {
   
   search: (keyword: string) => 
     apiCall(`/lost-found/search?keyword=${encodeURIComponent(keyword)}`),
+  
+  // New specific endpoints
+  healthCheck: () => apiCall('/lost-found/health'),
+  
+  getStatistics: () => apiCall('/lost-found/stats'),
+  
+  getUserItems: (userId: string) => 
+    apiCall(`/lost-found/user/${userId}`),
+  
+  getRecent: () => apiCall('/lost-found/recent'),
 };
 
 // Comments API
