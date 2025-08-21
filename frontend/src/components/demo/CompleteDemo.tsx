@@ -6,11 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import CreatePostForm from '@/components/forms/CreatePostForm';
 import CompleteFeed from '@/components/feed/CompleteFeed';
-import Dashboard from '@/components/dashboard/Dashboard';
-import AdvancedSearch from '@/components/search/AdvancedSearch';
-import ApiTestSuite from '@/components/integration/ApiTestSuite';
 
-type DemoView = 'feed' | 'create' | 'dashboard' | 'search' | 'api-test';
+type DemoView = 'feed' | 'create';
 
 const CompleteDemo: React.FC = () => {
   const [currentView, setCurrentView] = useState<DemoView>('feed');
@@ -27,24 +24,6 @@ const CompleteDemo: React.FC = () => {
       label: 'Create Posts', 
       icon: '➕',
       description: 'Create events, lost & found, announcements'
-    },
-    { 
-      key: 'dashboard', 
-      label: 'Dashboard', 
-      icon: '📊',
-      description: 'Statistics and health monitoring'
-    },
-    { 
-      key: 'search', 
-      label: 'Advanced Search', 
-      icon: '🔍',
-      description: 'Search and filter content'
-    },
-    { 
-      key: 'api-test', 
-      label: 'API Tests', 
-      icon: '🧪',
-      description: 'Test all backend endpoints'
     }
   ];
 
@@ -69,12 +48,6 @@ const CompleteDemo: React.FC = () => {
             />
           </div>
         );
-      case 'dashboard':
-        return <Dashboard />;
-      case 'search':
-        return <AdvancedSearch />;
-      case 'api-test':
-        return <ApiTestSuite />;
       default:
         return <CompleteFeed />;
     }
