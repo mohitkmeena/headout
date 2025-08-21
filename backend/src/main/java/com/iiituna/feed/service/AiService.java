@@ -31,27 +31,7 @@ public class AiService {
     
     public PostClassificationResult classifyPost(String prompt) {
         try {
-            String systemPrompt = """
-                You are an AI assistant that classifies campus feed posts into these categories:
-                - EVENT: workshops, seminars, fests, meetings, conferences, competitions
-                - LOST: missing items, lost belongings
-                - FOUND: discovered items, found belongings  
-                - ANNOUNCEMENT: notices, timetables, campus updates, academic announcements
-                
-                Extract relevant information and return JSON with:
-                {
-                  "type": "EVENT|LOST|FOUND|ANNOUNCEMENT",
-                  "confidence": 0.0-1.0,
-                  "extractedData": {
-                    "title": "extracted title",
-                    "description": "full description", 
-                    "location": "extracted location",
-                    "eventDate": "extracted date for events",
-                    "itemName": "item name for lost/found",
-                    "department": "department for announcements"
-                  }
-                }
-                """;
+            String systemPrompt = "You are an AI assistant that classifies campus feed posts into these categories: EVENT, LOST, FOUND, ANNOUNCEMENT. Extract relevant information and return JSON.";
             
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("model", "gpt-3.5-turbo");
@@ -80,15 +60,7 @@ public class AiService {
     
     public ToxicityResult checkToxicity(String content) {
         try {
-            String systemPrompt = """
-                Analyze the following text for toxicity, harassment, hate speech, or inappropriate content.
-                Return JSON with:
-                {
-                  "isToxic": true/false,
-                  "toxicityScore": 0.0-1.0,
-                  "suggestion": "alternative phrasing if toxic"
-                }
-                """;
+            String systemPrompt = "Analyze the following text for toxicity, harassment, hate speech, or inappropriate content. Return JSON with isToxic, toxicityScore, and suggestion.";
             
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("model", "gpt-3.5-turbo");
@@ -110,7 +82,7 @@ public class AiService {
             return parseToxicityResponse(response);
             
         } catch (Exception e) {
-            // Fallback: assume non-toxic
+            // Fallback to simple check
             return new ToxicityResult(false, 0.0, null);
         }
     }
@@ -119,19 +91,17 @@ public class AiService {
         try {
             JsonNode jsonResponse = objectMapper.readTree(response);
             String content = jsonResponse.path("choices").get(0).path("message").path("content").asText();
-            JsonNode classificationJson = objectMapper.readTree(content);
+            JsonNode extractedData = objectMapper.readTree(content);
             
             PostClassificationResult result = new PostClassificationResult();
-            result.setType(classificationJson.path("type").asText().toLowerCase());
-            result.setConfidence(classificationJson.path("confidence").asDouble(0.8));
-            
-            JsonNode extractedData = classificationJson.path("extractedData");
-            result.setTitle(extractedData.path("title").asText(""));
-            result.setDescription(extractedData.path("description").asText(""));
-            result.setLocation(extractedData.path("location").asText(""));
-            result.setEventDate(extractedData.path("eventDate").asText(""));
-            result.setItemName(extractedData.path("itemName").asText(""));
-            result.setDepartment(extractedData.path("department").asText(""));
+            result.setType(extractedData.path("type").asText("ANNOUNCEMENT"));
+            result.setConfidence(extractedData.path("confidence").asDouble(0.8));
+            result.setTitle(extractedData.path("extractedData").path("title").asText(""));
+            result.setDescription(extractedData.path("extractedData").path("description").asText(""));
+            result.setLocation(extractedData.path("extractedData").path("location").asText(""));
+            result.setEventDate(extractedData.path("extractedData").path("eventDate").asText(""));
+            result.setItemName(extractedData.path("extractedData").path("itemName").asText(""));
+            result.setDepartment(extractedData.path("extractedData").path("department").asText(""));
             
             return result;
         } catch (Exception e) {

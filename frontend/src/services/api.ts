@@ -32,17 +32,27 @@ export const eventsApi = {
   getById: (id: number, userId?: string) => 
     apiCall(`/events/${id}${userId ? `?userId=${userId}` : ''}`),
   
-  create: (eventData: any, userId: string) => 
-    apiCall(`/events?userId=${userId}`, {
+  create: (eventData: any, userId: string) => {
+    // Ensure proper date formatting
+    if (eventData.eventDate) {
+      eventData.eventDate = formatDateTime(eventData.eventDate);
+    }
+    return apiCall(`/events?userId=${userId}`, {
       method: 'POST',
       body: JSON.stringify(eventData),
-    }),
+    });
+  },
   
-  update: (id: number, eventData: any, userId: string) => 
-    apiCall(`/events/${id}?userId=${userId}`, {
+  update: (id: number, eventData: any, userId: string) => {
+    // Ensure proper date formatting
+    if (eventData.eventDate) {
+      eventData.eventDate = formatDateTime(eventData.eventDate);
+    }
+    return apiCall(`/events/${id}?userId=${userId}`, {
       method: 'PUT',
       body: JSON.stringify(eventData),
-    }),
+    });
+  },
   
   delete: (id: number, userId: string) => 
     apiCall(`/events/${id}?userId=${userId}`, {
@@ -81,11 +91,16 @@ export const lostFoundApi = {
   
   getById: (id: number) => apiCall(`/lost-found/${id}`),
   
-  create: (itemData: any, userId: string) => 
-    apiCall(`/lost-found?userId=${userId}`, {
+  create: (itemData: any, userId: string) => {
+    // Ensure proper date formatting
+    if (itemData.incidentDate) {
+      itemData.incidentDate = formatDateTime(itemData.incidentDate);
+    }
+    return apiCall(`/lost-found?userId=${userId}`, {
       method: 'POST',
       body: JSON.stringify(itemData),
-    }),
+    });
+  },
   
   update: (id: number, itemData: any, userId: string) => 
     apiCall(`/lost-found/${id}?userId=${userId}`, {
@@ -207,6 +222,21 @@ export const getUserDeviceId = (): string => {
     return deviceId;
   }
   return 'device_default';
+};
+
+// Date formatting utilities
+export const formatDateTime = (date: Date | string): string => {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+  return date.toISOString().slice(0, 19); // Format: YYYY-MM-DDTHH:mm:ss
+};
+
+export const formatDate = (date: Date | string): string => {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+  return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 };
 
 // Announcements API

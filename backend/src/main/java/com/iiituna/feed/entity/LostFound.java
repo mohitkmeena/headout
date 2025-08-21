@@ -31,7 +31,7 @@ public class LostFound {
     @Column(nullable = false)
     private String location;
     
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm[:ss]")
     @Column(name = "incident_date")
     private LocalDateTime incidentDate; // When item was lost/found
     

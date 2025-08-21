@@ -22,7 +22,7 @@ public class EventDto {
     
     @NotNull(message = "Event date is required")
     @Future(message = "Event date must be in the future")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm[:ss]")
     private LocalDateTime eventDate;
     
     private String imageUrl;

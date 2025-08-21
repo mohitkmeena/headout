@@ -32,7 +32,7 @@ public class Event {
     
     @NotNull(message = "Event date is required")
     @Future(message = "Event date must be in the future")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm[:ss]")
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
     

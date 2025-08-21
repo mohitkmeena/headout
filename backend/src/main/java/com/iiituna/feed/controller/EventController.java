@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -138,6 +139,27 @@ public class EventController {
                 .map(event -> convertToDto(event, userId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(eventDtos);
+    }
+    
+    // Test endpoint for date parsing
+    @PostMapping("/test-date")
+    public ResponseEntity<Map<String, Object>> testDateParsing(@RequestBody Map<String, String> request) {
+        try {
+            String dateStr = request.get("eventDate");
+            LocalDateTime parsedDate = LocalDateTime.parse(dateStr);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "originalDate", dateStr,
+                "parsedDate", parsedDate.toString(),
+                "message", "Date parsed successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage(),
+                "message", "Date parsing failed"
+            ));
+        }
     }
     
     // Get events by location

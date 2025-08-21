@@ -23,7 +23,7 @@ public class Comment {
     @Column(name = "created_by", nullable = false)
     private String createdBy; // Device ID
     
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm[:ss]")
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     
